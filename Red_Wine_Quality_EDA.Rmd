@@ -18,9 +18,60 @@ library(GGally)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
-# Importing the dataset
+# Importing the dataset into a dataframe
 
 df <- read.csv('wineQualityReds.csv')
+
+```
+
+# Abstract
+
+The purpose of this project is to explore the quality of red wine on the basis of its chemical properties. The study is carried out with help of the statistical program, RStudio. A brief description of the dataset can be seen [here](https://s3.amazonaws.com/udacity-hosted-downloads/ud651/wineQualityInfo.txt).
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Exploring the structure and summary of the dataframe
+
+str(df)
+
+
+```
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Exploring the structure and summary of the dataframe
+
+summary(df)
+
+```
+
+
+A few points observed from the summary and structure of the dataset :
+
+* The dataset contains shows 1599 observations with 13 variables.
+* As per the describtion, there are supposed to be only 11 chemical properties and one result quality of the wine resulting in only 12 variables. The 13th variable "X" appears to be the indexing and will be removed from the dataset before further investigation.
+* All the 11 chemical properties of redwine are continous variables.
+* The quality of red wine is an ordered categorical variable and will be converted accordingly in the dataframe.
+
+
+The structure and summary of the dataset after the above mentioned changes are as given below :
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Subsetting dataframe to exclude the indexing
+df <- df[,2:13]
+
+# Converting quality variable into an ordered factor
+df$quality <- factor(df$quality, ordered = T)
+
+```
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Exploring the structure and summary of the dataframe
+
+str(df)
+
+summary(df)
 
 ```
 
