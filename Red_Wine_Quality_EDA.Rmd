@@ -17,5 +17,10 @@ library(gridExtra)
 library(GGally)
 ```
 
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Importing the dataset
 
+df <- read.csv('wineQualityReds.csv')
+
+```
 
