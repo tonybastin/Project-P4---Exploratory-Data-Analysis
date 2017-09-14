@@ -1,0 +1,21 @@
+EDA on Red Wine Quality 
+========================================================
+>by Tony Bastin
+
+```{r include = FALSE}
+knitr::opts_chunk$set(echo = FALSE)
+```
+
+```{r message = FALSE, warning = FALSE}
+# Importing the libraries
+
+library(ggplot2)
+library(reshape2)
+library(dplyr)
+library(tidyr)
+library(gridExtra)
+library(GGally)
+```
+
+
+
