@@ -48,13 +48,13 @@ summary(df)
 
 A few points observed from the summary and structure of the dataset :
 
-* The dataset contains shows 1599 observations with 13 variables.
-* As per the describtion, there are supposed to be only 11 chemical properties and one result quality of the wine resulting in only 12 variables. The 13th variable "X" appears to be the indexing and will be removed from the dataset before further investigation.
+* The dataset contains 1599 observations with 13 variables.
+* As per the description, there are supposed to be only 11 chemical properties and one result quality of the wine resulting in a total of only 12 variables. The 13th variable "X" appears to be the indexing and will be removed from the dataset before further investigation.
 * All the 11 chemical properties of redwine are continous variables.
 * The quality of red wine is an ordered categorical variable and will be converted accordingly in the dataframe.
 
 
-The structure and summary of the dataset after the above mentioned changes are as given below :
+The structure and summary of the dataset after doing the above mentioned changes are as given below :
 
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -74,4 +74,165 @@ str(df)
 summary(df)
 
 ```
+
+# Univariate Plots Section
+
+The histograms of all the 12 variables were made to get an idea of their distributions:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Plotting the histograms of all the 11 checmical properties and quality.
+
+p1 <- ggplot(data = df, aes( x = fixed.acidity))+
+  geom_histogram()
+p2 <- ggplot(data = df, aes( x = volatile.acidity))+
+  geom_histogram()
+p3 <- ggplot(data = df, aes( x = citric.acid))+
+  geom_histogram()
+p4 <- ggplot(data = df, aes( x = residual.sugar))+
+  geom_histogram()
+p5 <- ggplot(data = df, aes( x = chlorides))+
+  geom_histogram()
+p6 <- ggplot(data = df, aes( x = free.sulfur.dioxide))+
+  geom_histogram()
+p7 <- ggplot(data = df, aes( x = total.sulfur.dioxide))+
+  geom_histogram()
+p8 <- ggplot(data = df, aes( x = density))+
+  geom_histogram()
+p9 <- ggplot(data = df, aes( x = pH))+
+  geom_histogram()
+p10 <- ggplot(data = df, aes( x = sulphates))+
+  geom_histogram()
+p11 <- ggplot(data = df, aes( x = alcohol))+
+  geom_histogram()
+p12 <- ggplot(data = df, aes( x = quality))+
+  geom_bar()
+
+grid.arrange(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12, ncol = 3)
+
+rm(p1,p2,p3,p4,p5,p6,p7,p8,p9,p10,p11,p12)
+```
+
+From the above histograms, we can comment on the skewness of the 11 chemical properties as below:
+
+* Normal distribution: Volatile Acidity, Density, PH
+
+* Long tailed positively skewed distribution: Fixed Acidity, Free Sulfur Dioxide, Total Sulfur Dioxide, Sulphates, Alcohol
+
+* Residual sugar, Chlorides have extreme outliers
+
+* Citric acid  have a large number of zero values
+
+Skewed and long tailed data can be converted into normal distributions by transformig the data using either sqrt or log10 transformation. We will apply the transformations on a few variables and the histograms before and after transformations are shown below:
+
+1) Sulphates :
+
+The application of log10 transformation on sulphates have transformed it into a normal distribution
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+
+p1 <- ggplot(data = df, aes( x = sulphates))+
+  geom_histogram()
+
+p2 <- ggplot(data = df, aes( x = log10(sulphates)))+
+  geom_histogram()
+
+grid.arrange(p1,p2, ncol = 2)
+
+rm(p1,p2)
+
+```
+
+2) Total sulphur dioxide :
+
+The application of log10 transformation on total sulphur dioxide have transformed it into a normal distribution
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+
+p1 <- ggplot(data = df, aes( x = total.sulfur.dioxide))+
+  geom_histogram()
+
+p2 <- ggplot(data = df, aes( x = log10(total.sulfur.dioxide)))+
+  geom_histogram()
+
+grid.arrange(p1,p2, ncol = 2)
+
+rm(p1,p2)
+
+```
+
+
+3) Fixed acidity :
+
+The application of sqrt transformation on fixed acidity have transformed it into a normal distribution with a few outliers.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+
+p1 <- ggplot(data = df, aes( x = fixed.acidity))+
+  geom_histogram()
+
+p2 <- ggplot(data = df, aes( x = sqrt(fixed.acidity)))+
+  geom_histogram()
+
+grid.arrange(p1,p2, ncol = 2)
+
+rm(p1,p2)
+
+```
+
+
+The red wines were given different ratings based on their quality into 'bad', 'average' and 'good'. This will help a lot in future visualizations. From the below table and bar chart, it is evedent that most of the wines (1319) belong to the average category and only a few number (217) gets into the category of good quality wines.
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Splitting wines into different bins based on their quality 
+df$rating <- ifelse(df$quality < 5, 'bad', ifelse(
+  df$quality < 7, 'average', 'good'))
+
+# Converting the wine rating into an ordered factor
+df$rating <- ordered(df$rating,
+                     levels = c('bad', 'average', 'good'))
+
+# Gives the number of wine of each rating
+table(df$rating)
+
+```
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# Plotting the bar chart for wine ratings
+ggplot(data = df, aes( x = rating))+
+  geom_bar()
+
+```
+
+
+# Univariate Analysis
+
+
+### What is the structure of your dataset?
+
+* The dataset contains 1599 observations of 12 variables
+* The variable quality is categorical with the values ranging from 3 to 8, with a mean of 5.6 and median of 6
+* The other 11 variabels are categorical
+
+### What is/are the main feature(s) of interest in your dataset?
+
+The main feature of interest is the quality of redwine and it would be interesting to study how the quality is affected by the other variables.
+
+### What other features in the dataset do you think will help support your \ investigation into your feature(s) of interest?
+
+I strongly believe that the different measures of acidity ( pH, fixed acidity, volatile acidity, citric acid) and  alcholo content will have influence on the quality of wines.
+
+### Did you create any new variables from existing variables in the dataset?
+ A new variable called rating was introduced which classifies the different wines based on their quality into  'bad' (3,4,5), 'average' (5, 6), and 'good' (7,8).
+ 
+### Of the features you investigated, were there any unusual distributions? \ Did you perform any operations on the data to tidy, adjust, or change the form \ of the data? If so, why did you do this?
+
+* The variable "X" in the dataframe was removed as it was just used for indexing.
+* The quality of red wine is converted into an ordered categorical variable.
+* Citric acid was having a lot of zero values, however nothing was done as the reason was not clear.
+
+
 
