@@ -15,6 +15,8 @@ library(dplyr)
 library(tidyr)
 library(gridExtra)
 library(GGally)
+library(Hmisc)
+library(pander)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -226,7 +228,7 @@ The main feature of interest is the quality of redwine and it would be interesti
 I strongly believe that the different measures of acidity ( pH, fixed acidity, volatile acidity, citric acid) and  alcholo content will have influence on the quality of wines.
 
 ### Did you create any new variables from existing variables in the dataset?
- A new variable called rating was introduced which classifies the different wines based on their quality into  'bad' (3,4,5), 'average' (5, 6), and 'good' (7,8).
+ A new variable called rating was introduced which classifies the different wines based on their quality into  'bad' (3,4), 'average' (5, 6), and 'good' (7,8).
  
 ### Of the features you investigated, were there any unusual distributions? \ Did you perform any operations on the data to tidy, adjust, or change the form \ of the data? If so, why did you do this?
 
@@ -234,5 +236,136 @@ I strongly believe that the different measures of acidity ( pH, fixed acidity, v
 * The quality of red wine is converted into an ordered categorical variable.
 * Citric acid was having a lot of zero values, however nothing was done as the reason was not clear.
 
+# Bivariate Plots Section
+
+A correlation table between the wine quality and each chemical property will help us to understand which factors are affecting the wine qality.
+
+Table below shows the r-values of checmical properties w.r.t wine quality.
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Creating new dataframe by ignoring rating and changing quality into numeric format 
+df1<- df %>%
+  select(-rating) %>%
+  mutate(quality = as.numeric(quality))
+
+# Finding and Printing out correlation 
+cor_df <- cor(df1)
+cor_df  <- stack(cor_df[1:11,"quality"])
+names(cor_df ) <- c("R-Value", "Chemical Property")
+cor_df  <- cor_df [c("Chemical Property", "R-Value")]
+cor_df 
+```
+From the above table we can see that the following chemical properties have relatively higher correlations to wine quality:
+
+* alcohol           - 0.476
+* volatile acidity  - 0.391
+* sulphates         - 0.251
+* citric acid       - 0.226
+
+To my surpirse, it was noticed that no strong correlation excisted between pH, fixed acidity and wine quality. However, suplates was observed to have higher correlation.
+
+Let us examine how the alchol, volatile acidity, sulphates and  citric acid contents effect quality of wine.For this, we will make boxplots and scatter plots as shown below for these 4 chemical propoerties.
+
+1) alchol vs rating
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# For plotting box plot and scatter plot with jitter
+g <- ggplot(aes(x=rating,y=alcohol),data=df)
+g1 <- g + geom_jitter()
+g2 <- g + geom_boxplot()
+
+grid.arrange(g1,g2, ncol= 2)
+```
 
 
+2) volatile acidity vs rating
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# For plotting box plot and scatter plot with jitter
+g <- ggplot(aes(x=rating,y=volatile.acidity),data=df)
+g1 <- g + geom_jitter()
+g2 <- g + geom_boxplot()
+
+grid.arrange(g1,g2, ncol= 2)
+```
+
+3) sulphates vs rating
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# For plotting box plot and scatter plot with jitter
+g <- ggplot(aes(x=rating,y=sulphates),data=df)
+g1 <- g + geom_jitter()
+g2 <- g + geom_boxplot()
+
+grid.arrange(g1,g2, ncol= 2)
+
+```
+
+4) citric acid vs rating
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# For plotting box plot and scatter plot with jitter
+g <- ggplot(aes(x=rating,y=citric.acid),data=df)
+g1 <- g + geom_jitter()
+g2 <- g + geom_boxplot()
+
+grid.arrange(g1,g2, ncol= 2)
+```
+
+
+From the above plots, it is evident that good quality wine  have higher alcholol, sulphates and citric acid content and low volatile acidity.
+
+
+Let us also examine, whether any correlation excist between these chemical properties.
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+
+grid.arrange(ggplot(data = df, aes(x = sulphates, y = alcohol)) +
+  geom_point(aes(color = rating))+geom_smooth(method = 'lm') + ggtitle("R-value : ",round(cor(df$sulphates, df$alcohol), 3)) ,
+
+ggplot(data = df, aes(x = volatile.acidity, y = alcohol)) +
+  geom_point(aes(color = rating))+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$volatile.acidity, df$alcohol), 3)) ,
+
+ggplot(data = df, aes(x = citric.acid, y = alcohol)) +
+  geom_point(aes(color = rating))+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$citric.acid, df$alcohol), 3)) ,
+
+ggplot(data = df, aes(x = volatile.acidity, y = sulphates)) +
+  geom_point(aes(color = rating))+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$volatile.acidity, df$sulphates), 3)) ,
+
+ggplot(data = df, aes(x = citric.acid, y = sulphates)) +
+  geom_point(aes(color = rating))+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$citric.acid, df$sulphates), 3)) ,
+
+ggplot(data = df, aes(x = citric.acid, y = volatile.acidity)) +
+  geom_point(aes(color = rating))+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$citric.acid, df$volatile.acidity), 3)) ,
+
+ncol =2)
+
+
+```
+
+The volatile acididty and citric acid has a strong negative correlation of 0.552 indicating that the higher quantities of volatile acidity means low quantities of citric acid.
+
+It also appears that higher the citric acid content, the higher is the sulphate content which is evident from the positive correlation of 0.313.
+
+# Bivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the \ investigation. How did the feature(s) of interest vary with other features in \ the dataset?
+
+* A good quality wine will have higher alcholol, sulphates and citric acid content and low volatile acidity.
+* Citric acid and sulphate contents were positievely correlated.
+* Citric acid and Volatile acidity was negatively correlatd.
+
+
+### Did you observe any interesting relationships between the other features \ (not the main feature(s) of interest)?
+
+* Positive correlation of 0.313 was observed between the citric acid and sulphate content.
+* Negative correlation of 0.552 was observed between the citric acid and volatile acidity content
+
+### What was the strongest relationship you found?
+
+A strongest positive correlation of .476 excisted between wine quality and alcohol content. The wine quality increases with the increase in alcohol content.
