@@ -15,6 +15,7 @@ library(dplyr)
 library(tidyr)
 library(gridExtra)
 library(GGally)
+library(memisc)
 library(Hmisc)
 library(pander)
 ```
@@ -243,8 +244,7 @@ A correlation table between the wine quality and each chemical property will hel
 Table below shows the r-values of checmical properties w.r.t wine quality.
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 # Creating new dataframe by ignoring rating and changing quality into numeric format 
-df1<- df %>%
-  select(-rating) %>%
+df1 <- df[1:12]%>%
   mutate(quality = as.numeric(quality))
 
 # Finding and Printing out correlation 
@@ -313,6 +313,10 @@ g1 <- g + geom_jitter()
 g2 <- g + geom_boxplot()
 
 grid.arrange(g1,g2, ncol= 2)
+
+
+# Removing g, g1 & g2
+rm(g, g1, g2)
 ```
 
 
@@ -326,22 +330,22 @@ Let us also examine, whether any correlation excist between these chemical prope
 
 
 grid.arrange(ggplot(data = df, aes(x = sulphates, y = alcohol)) +
-  geom_point(aes(color = rating))+geom_smooth(method = 'lm') + ggtitle("R-value : ",round(cor(df$sulphates, df$alcohol), 3)) ,
+  geom_point()+geom_smooth(method = 'lm') + ggtitle("R-value : ",round(cor(df$sulphates, df$alcohol), 3)) ,
 
 ggplot(data = df, aes(x = volatile.acidity, y = alcohol)) +
-  geom_point(aes(color = rating))+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$volatile.acidity, df$alcohol), 3)) ,
+  geom_point()+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$volatile.acidity, df$alcohol), 3)) ,
 
 ggplot(data = df, aes(x = citric.acid, y = alcohol)) +
-  geom_point(aes(color = rating))+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$citric.acid, df$alcohol), 3)) ,
+  geom_point()+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$citric.acid, df$alcohol), 3)) ,
 
 ggplot(data = df, aes(x = volatile.acidity, y = sulphates)) +
-  geom_point(aes(color = rating))+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$volatile.acidity, df$sulphates), 3)) ,
+  geom_point()+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$volatile.acidity, df$sulphates), 3)) ,
 
 ggplot(data = df, aes(x = citric.acid, y = sulphates)) +
-  geom_point(aes(color = rating))+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$citric.acid, df$sulphates), 3)) ,
+  geom_point()+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$citric.acid, df$sulphates), 3)) ,
 
 ggplot(data = df, aes(x = citric.acid, y = volatile.acidity)) +
-  geom_point(aes(color = rating))+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$citric.acid, df$volatile.acidity), 3)) ,
+  geom_point()+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$citric.acid, df$volatile.acidity), 3)) ,
 
 ncol =2)
 
@@ -369,3 +373,95 @@ It also appears that higher the citric acid content, the higher is the sulphate 
 ### What was the strongest relationship you found?
 
 A strongest positive correlation of .476 excisted between wine quality and alcohol content. The wine quality increases with the increase in alcohol content.
+
+# Multivariate Plots Section
+
+We can add another dimension into the plot by adding colors. Let us examine the effect of alcohol content and volatile acidity on wine quality . I have also added littele bit jitteer and also alpha parameter to get over oveploatting.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ ggplot(df, aes(x= quality, y=alcohol, color = volatile.acidity))+
+        geom_jitter(alpha=1/4,size=3)+
+        scale_colour_gradient2(low="red", high="blue",
+                               mid="green",midpoint = 0.8)
+    
+
+```
+
+We can add 4th dimension to the plots by adding the wrapping. Lets us examine further the relationship between citric acid and volatile acidity based on quality and rating
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(data = df,
+       aes(x = citric.acid, y = volatile.acidity, color = quality)) +
+  geom_point() +
+  facet_wrap(~rating)
+
+
+```
+
+Lets us examine further the relationship between citric acid and sulphate acidity based on quality and rating
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+ggplot(data = df,
+       aes(x = citric.acid, y = sulphates, color = quality)) +
+  geom_point() +
+  facet_wrap(~rating)
+
+
+```
+
+Lets us examine further the relationship between citric acid and pH acidity based on quality and rating
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+ggplot(data = df,
+       aes(x = citric.acid, y = pH, color = quality)) +
+  geom_point() +
+  facet_wrap(~rating)
+
+
+```
+
+# Linear model
+
+A linear model for quality was created using the four major chemical properties : alcohol, volatile acidity, sulphates and citric acid.The important parameters for the model is also given in thr table below.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# Building the model
+m1 <- lm(quality ~ alcohol, data = df1)
+m2 <- update(m1, ~ . + volatile.acidity)
+m3 <- update(m2, ~ . + sulphates)
+m4 <- update(m3, ~ . + citric.acid)
+mtable(m1, m2, m3, m4)
+
+```
+Plotting the error made by the linear model:
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+# Storing the errors to a model
+df2 <- data.frame( df1$quality,
+  predict(m4, df1) - df1$quality)
+
+# Plotting the errors wrt quality
+names(df2) <- c("quality", "error")
+ggplot(data=df2, aes(x=quality,y=error)) +
+  geom_jitter()
+
+
+```
+
+# Multivariate Analysis
+
+### Talk about some of the relationships you observed in this part of the investigation. Were there features that strengthened each other in terms of looking at your feature(s) of interest?
+
+* Low volatile acidity and high alcohol contents seem to produce good quality wines.
+* High citric acid and low volatile acidity contents seem to produce good quality wines.
+* High sulphate and high achol contents produces good quality wines
+* pH levels didn't seem to influence the quality of wine
+
+### OPTIONAL: Did you create any models with your dataset? Discuss the strengths and limitations of your model.
+
+A linear model to predict the quality of red wine was made with the four major chemical properties : alcohol, volatile acidity, sulphates and citric acid. The predictions made by the model was off by + or - 2. The  limitations of fitting a linear model to this dataset is obvious. We should be using classification algorithams to make the predcictions.
+
