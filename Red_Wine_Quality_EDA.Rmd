@@ -461,7 +461,82 @@ ggplot(data=df2, aes(x=quality,y=error)) +
 * High sulphate and high achol contents produces good quality wines
 * pH levels didn't seem to influence the quality of wine
 
-### OPTIONAL: Did you create any models with your dataset? Discuss the strengths and limitations of your model.
+### Did you create any models with your dataset? Discuss the strengths and limitations of your model.
 
 A linear model to predict the quality of red wine was made with the four major chemical properties : alcohol, volatile acidity, sulphates and citric acid. The predictions made by the model was off by + or - 2. The  limitations of fitting a linear model to this dataset is obvious. We should be using classification algorithams to make the predcictions.
+
+# Final Plots and Summary
+
+
+### Plot One : Alcohol vs Wine Quality
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+ggplot(data = df, aes(x = quality, y = alcohol,
+                      fill = rating)) +
+  geom_boxplot() +
+  ggtitle('Alcohol Levels in Wines ') +
+  xlab('Quality') +
+  ylab('Alcohol Content')
+```
+
+### Description One 
+
+The above boxplot revealed that good wines have higher alcohol content in them.
+
+### Plot Two : Acids vs Wine quality
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+
+g1 <- ggplot(data = df, aes(x = quality, y = volatile.acidity,fill = quality)) +
+  ylab('Volatile Acidity') +
+  xlab('Quality') +
+  ggtitle('Acidity in Wines ')+
+  geom_boxplot()
+
+g2 <- ggplot(data = df, aes(x = quality, y = citric.acid,fill = quality)) +
+  ylab('Citric Acid') +
+  xlab('Quality') +
+  geom_boxplot()
+             
+grid.arrange(g1, g2)
+
+rm(g1, g2)
+
+```
+
+### Description Two
+
+The above boxplots were created to demonstrate the effect of volatile acidity and acetic acid on wine quality. It is evident that the presence of citric acid has a positive impact on the wine quality whereas volatile acidity impacts the wine quality negatively.
+
+### Plot Three : Effect of alcohol content and volatile acidity on wine quality
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+
+ggplot(data = df,
+       aes(x = volatile.acidity, y = alcohol,
+                      color = rating)) +
+  geom_point() +
+  ggtitle('Alcohol vs. Volatile Acidity and Wine Quality') +
+  xlab('Volatile Acidity (g / dm^3)') +
+  ylab('Alcohol (% volume)')+
+  facet_wrap(~rating)
+
+```
+
+### Description Three
+
+From the above scatter plot, we can clearly make out that good wines have higher alcohol content and low volatile acidity 
+
+------
+
+# Reflection
+
+The red wine data set contains information on the chemical properties of wines.It contains 1,599 observation with 11 variables on the chemical properties.
+
+The initial approach was to find out the chemical properties which has the highest correlation the quality of the wine. The four major chemical properties found out after the correlation analysis were: alcohol(0.476), volatile acidity(-0.391), sulphates(0.251),citric acid(0.226). Alcohol, acetic acid and sulphates content increases the quality of wine whereas the content of volatile acidity decreases the quality of wine. 
+
+Most of the viswalizations created also supported the findings from correlation studies.
+
+The linear model created from these four chemical properties made a lot of errors in the prediction since this was a classification problem rather than a regresion one.
+
+
 
