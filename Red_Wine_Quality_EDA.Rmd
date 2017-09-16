@@ -329,25 +329,39 @@ Let us also examine, whether any correlation excist between these chemical prope
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 
-grid.arrange(ggplot(data = df, aes(x = sulphates, y = alcohol)) +
-  geom_point()+geom_smooth(method = 'lm') + ggtitle("R-value : ",round(cor(df$sulphates, df$alcohol), 3)) ,
+grid.arrange(
+  
+  ggplot(data = df, aes(x = sulphates, y = alcohol)) +
+    geom_point()+
+    geom_smooth(method = 'lm') + 
+    ggtitle("R-value : ",round(cor(df$sulphates, df$alcohol), 3)) ,
+             
+  ggplot(data = df, aes(x = volatile.acidity, y = alcohol)) +
+    geom_point()+
+    geom_smooth(method = 'lm')+ 
+     ggtitle("R-value : ",round(cor(df$volatile.acidity, df$alcohol), 3)) ,
 
-ggplot(data = df, aes(x = volatile.acidity, y = alcohol)) +
-  geom_point()+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$volatile.acidity, df$alcohol), 3)) ,
+  ggplot(data = df, aes(x = citric.acid, y = alcohol)) +
+    geom_point()+
+    geom_smooth(method = 'lm')+ 
+    ggtitle("R-value : ",round(cor(df$citric.acid, df$alcohol), 3)) ,
 
-ggplot(data = df, aes(x = citric.acid, y = alcohol)) +
-  geom_point()+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$citric.acid, df$alcohol), 3)) ,
+  ggplot(data = df, aes(x = volatile.acidity, y = sulphates)) +
+    geom_point()+
+    geom_smooth(method = 'lm')+ 
+    ggtitle("R-value : ",round(cor(df$volatile.acidity, df$sulphates), 3)) ,
 
-ggplot(data = df, aes(x = volatile.acidity, y = sulphates)) +
-  geom_point()+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$volatile.acidity, df$sulphates), 3)) ,
+  ggplot(data = df, aes(x = citric.acid, y = sulphates)) +
+    geom_point()+
+    geom_smooth(method = 'lm')+ 
+    ggtitle("R-value : ",round(cor(df$citric.acid, df$sulphates), 3)) ,
 
-ggplot(data = df, aes(x = citric.acid, y = sulphates)) +
-  geom_point()+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$citric.acid, df$sulphates), 3)) ,
+  ggplot(data = df, aes(x = citric.acid, y = volatile.acidity)) +
+    geom_point()+
+    geom_smooth(method = 'lm')+ 
+    ggtitle("R-value : ",round(cor(df$citric.acid, df$volatile.acidity), 3)) ,
 
-ggplot(data = df, aes(x = citric.acid, y = volatile.acidity)) +
-  geom_point()+geom_smooth(method = 'lm')+ ggtitle("R-value : ",round(cor(df$citric.acid, df$volatile.acidity), 3)) ,
-
-ncol =2)
+  ncol =2 )
 
 
 ```
@@ -381,7 +395,7 @@ We can add another dimension into the plot by adding colors. Let us examine the 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
  ggplot(df, aes(x= quality, y=alcohol, color = volatile.acidity))+
         geom_jitter(alpha=1/4,size=3)+
-        scale_colour_gradient2(low="red", high="blue",
+        scale_colour_gradient2(low="red", high="blue", 
                                mid="green",midpoint = 0.8)
     
 
@@ -471,8 +485,7 @@ A linear model to predict the quality of red wine was made with the four major c
 ### Plot One : Alcohol vs Wine Quality
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
-ggplot(data = df, aes(x = quality, y = alcohol,
-                      fill = rating)) +
+ggplot(data = df, aes(x = quality, y = alcohol, fill = rating)) +
   geom_boxplot() +
   ggtitle('Alcohol Levels in Wines ') +
   xlab('Quality') +
@@ -487,13 +500,15 @@ The above boxplot revealed that good wines have higher alcohol content in them.
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 
-g1 <- ggplot(data = df, aes(x = quality, y = volatile.acidity,fill = quality)) +
+g1 <- ggplot(data = df, 
+             aes(x = quality, y = volatile.acidity,fill = quality)) +
   ylab('Volatile Acidity') +
   xlab('Quality') +
   ggtitle('Acidity in Wines ')+
   geom_boxplot()
 
-g2 <- ggplot(data = df, aes(x = quality, y = citric.acid,fill = quality)) +
+g2 <- ggplot(data = df, 
+             aes(x = quality, y = citric.acid,fill = quality)) +
   ylab('Citric Acid') +
   xlab('Quality') +
   geom_boxplot()
@@ -512,8 +527,7 @@ The above boxplots were created to demonstrate the effect of volatile acidity an
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 ggplot(data = df,
-       aes(x = volatile.acidity, y = alcohol,
-                      color = rating)) +
+       aes(x = volatile.acidity, y = alcohol, color = rating)) +
   geom_point() +
   ggtitle('Alcohol vs. Volatile Acidity and Wine Quality') +
   xlab('Volatile Acidity (g / dm^3)') +
