@@ -18,6 +18,7 @@ library(GGally)
 library(memisc)
 library(Hmisc)
 library(pander)
+library(corrplot)
 ```
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
@@ -239,17 +240,33 @@ I strongly believe that the different measures of acidity ( pH, fixed acidity, v
 
 # Bivariate Plots Section
 
-A correlation table between the wine quality and each chemical property will help us to understand which factors are affecting the wine qality.
+A correlation plot between the wine quality and each chemical property will help us to understand which factors are affecting the wine qality.
 
-Table below shows the r-values of checmical properties w.r.t wine quality.
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 # Creating new dataframe by ignoring rating and changing quality into numeric format 
 df1 <- df[1:12]%>%
   mutate(quality = as.numeric(quality))
 
-# Finding and Printing out correlation 
+# Code below to be used to save a plot
+#png(height=1200, width=1500, pointsize=15, file="overlap.png")
+
+# Making correlation plots
 cor_df <- cor(df1)
-cor_df  <- stack(cor_df[1:11,"quality"])
+corrplot(cor_df, method="color",
+         type = "lower", tl.col = 'black',
+         tl.cex = .6,tl.srt = 40,
+         addCoef.col = "black", 
+         number.cex=0.6,
+         diag = FALSE)
+
+
+
+```
+
+Table below shows the r-values of checmical properties w.r.t wine quality.
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+# Finding and Printing out correlation 
+cor_df  <- stack(cor_df[0:11,"quality"])
 names(cor_df ) <- c("R-Value", "Chemical Property")
 cor_df  <- cor_df [c("Chemical Property", "R-Value")]
 cor_df 
@@ -270,11 +287,14 @@ Let us examine how the alchol, volatile acidity, sulphates and  citric acid cont
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 # For plotting box plot and scatter plot with jitter
-g <- ggplot(aes(x=rating,y=alcohol),data=df)
-g1 <- g + geom_jitter()
-g2 <- g + geom_boxplot()
-
-grid.arrange(g1,g2, ncol= 2)
+ggplot(aes(x=rating,y=alcohol),data=df)+
+  geom_boxplot(alpha = .5,color = 'blue')+
+  geom_jitter( alpha = .3)  +
+  stat_summary(fun.y = "mean", 
+               geom = "point", 
+               color = "red", 
+               shape = 8, 
+               size = 4)
 ```
 
 
@@ -283,11 +303,14 @@ grid.arrange(g1,g2, ncol= 2)
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 # For plotting box plot and scatter plot with jitter
-g <- ggplot(aes(x=rating,y=volatile.acidity),data=df)
-g1 <- g + geom_jitter()
-g2 <- g + geom_boxplot()
-
-grid.arrange(g1,g2, ncol= 2)
+ggplot(aes(x=rating,y=volatile.acidity),data=df)+
+      geom_boxplot(alpha = .5,color = 'blue')+
+      geom_jitter( alpha = .3)  +
+      stat_summary(fun.y = "mean", 
+               geom = "point", 
+               color = "red", 
+               shape = 8, 
+               size = 4)
 ```
 
 3) sulphates vs rating
@@ -295,11 +318,15 @@ grid.arrange(g1,g2, ncol= 2)
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 # For plotting box plot and scatter plot with jitter
-g <- ggplot(aes(x=rating,y=sulphates),data=df)
-g1 <- g + geom_jitter()
-g2 <- g + geom_boxplot()
+ggplot(aes(x=rating,y=sulphates),data=df)+
+      geom_boxplot(alpha = .5,color = 'blue')+
+      geom_jitter( alpha = .3)  +
+      stat_summary(fun.y = "mean", 
+               geom = "point", 
+               color = "red", 
+               shape = 8, 
+               size = 4)
 
-grid.arrange(g1,g2, ncol= 2)
 
 ```
 
@@ -308,15 +335,15 @@ grid.arrange(g1,g2, ncol= 2)
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 
 # For plotting box plot and scatter plot with jitter
-g <- ggplot(aes(x=rating,y=citric.acid),data=df)
-g1 <- g + geom_jitter()
-g2 <- g + geom_boxplot()
+ggplot(aes(x=rating,y=citric.acid),data=df)+
+      geom_boxplot(alpha = .5,color = 'blue')+
+      geom_jitter( alpha = .3)  +
+      stat_summary(fun.y = "mean", 
+               geom = "point", 
+               color = "red", 
+               shape = 8, 
+               size = 4)
 
-grid.arrange(g1,g2, ncol= 2)
-
-
-# Removing g, g1 & g2
-rm(g, g1, g2)
 ```
 
 
@@ -332,32 +359,32 @@ Let us also examine, whether any correlation excist between these chemical prope
 grid.arrange(
   
   ggplot(data = df, aes(x = sulphates, y = alcohol)) +
-    geom_point()+
+    geom_point(alpha = 1/10)+
     geom_smooth(method = 'lm') + 
     ggtitle("R-value : ",round(cor(df$sulphates, df$alcohol), 3)) ,
              
   ggplot(data = df, aes(x = volatile.acidity, y = alcohol)) +
-    geom_point()+
+    geom_point(alpha = 1/10)+
     geom_smooth(method = 'lm')+ 
      ggtitle("R-value : ",round(cor(df$volatile.acidity, df$alcohol), 3)) ,
 
   ggplot(data = df, aes(x = citric.acid, y = alcohol)) +
-    geom_point()+
+    geom_point(alpha = 1/10)+
     geom_smooth(method = 'lm')+ 
     ggtitle("R-value : ",round(cor(df$citric.acid, df$alcohol), 3)) ,
 
   ggplot(data = df, aes(x = volatile.acidity, y = sulphates)) +
-    geom_point()+
+    geom_point(alpha = 1/10)+
     geom_smooth(method = 'lm')+ 
     ggtitle("R-value : ",round(cor(df$volatile.acidity, df$sulphates), 3)) ,
 
   ggplot(data = df, aes(x = citric.acid, y = sulphates)) +
-    geom_point()+
+    geom_point(alpha = 1/10)+
     geom_smooth(method = 'lm')+ 
     ggtitle("R-value : ",round(cor(df$citric.acid, df$sulphates), 3)) ,
 
   ggplot(data = df, aes(x = citric.acid, y = volatile.acidity)) +
-    geom_point()+
+    geom_point(alpha = 1/10)+
     geom_smooth(method = 'lm')+ 
     ggtitle("R-value : ",round(cor(df$citric.acid, df$volatile.acidity), 3)) ,
 
@@ -393,12 +420,11 @@ A strongest positive correlation of .476 excisted between wine quality and alcoh
 We can add another dimension into the plot by adding colors. Let us examine the effect of alcohol content and volatile acidity on wine quality . I have also added littele bit jitteer and also alpha parameter to get over oveploatting.
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
- ggplot(df, aes(x= quality, y=alcohol, color = volatile.acidity))+
-        geom_jitter(alpha=1/4,size=3)+
-        scale_colour_gradient2(low="red", high="blue", 
-                               mid="green",midpoint = 0.8)
+ ggplot(df, aes(x= volatile.acidity, y=alcohol, color =factor(quality) ))+
+      geom_point(alpha=0.8,size=1)+
+      geom_smooth(method = "lm", se = FALSE,size=1)  +
+      scale_color_brewer(type='seq', guide=guide_legend(title='Quality'))
     
-
 ```
 
 We can add 4th dimension to the plots by adding the wrapping. Lets us examine further the relationship between citric acid and volatile acidity based on quality and rating
@@ -407,6 +433,7 @@ We can add 4th dimension to the plots by adding the wrapping. Lets us examine fu
 ggplot(data = df,
        aes(x = citric.acid, y = volatile.acidity, color = quality)) +
   geom_point() +
+  geom_smooth(method = "lm", se = FALSE,size=1)+
   facet_wrap(~rating)
 
 
@@ -420,6 +447,7 @@ Lets us examine further the relationship between citric acid and sulphate acidit
 ggplot(data = df,
        aes(x = citric.acid, y = sulphates, color = quality)) +
   geom_point() +
+  geom_smooth(method = "lm", se = FALSE,size=1)+
   facet_wrap(~rating)
 
 
@@ -431,6 +459,7 @@ Lets us examine further the relationship between citric acid and pH acidity base
 ggplot(data = df,
        aes(x = citric.acid, y = pH, color = quality)) +
   geom_point() +
+  geom_smooth(method = "lm", se = FALSE,size=1)+
   facet_wrap(~rating)
 
 
@@ -552,5 +581,14 @@ Most of the viswalizations created also supported the findings from correlation 
 
 The linear model created from these four chemical properties made a lot of errors in the prediction since this was a classification problem rather than a regresion one.
 
+One limitations of this study is the source of the data. The red wines selectd for  the study was only from Portugal and information about the wine tasters i.e. they are Portugese or Interantional is not given so the qualities reported is not a generalisation for red wines all over the world. 
+
+As a further work, I would recommend investigating with inferential statistics to quantitatively confirm these assertions and making prediction using nonlinear regression model and classification algorithms for achieving models with better prediction and accuracy. 
 
 
+
+# References
+https://www.udacity.com/
+https://cran.r-project.org/web/packages/corrplot/vignettes/corrplot-intro.html
+http://www.sthda.com/english/wiki/visualize-correlation-matrix-using-correlogram
+http://ggplot.yhathq.com/
